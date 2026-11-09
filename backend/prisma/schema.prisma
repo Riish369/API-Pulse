@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Monitor {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  isActive    Boolean  @default(true)
+  currentUp   Boolean?
+  lastChecked DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  checks      Check[]
+
+  @@index([createdAt])
+}
+
+model Check {
+  id          String   @id @default(cuid())
+  monitorId   String
+  statusCode  Int?
+  latencyMs   Int?
+  isUp        Boolean
+  error       String?
+  isAnomaly   Boolean  @default(false)
+  anomalyNote String?
+  checkedAt   DateTime @default(now())
+  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, checkedAt])
+}

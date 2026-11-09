@@ -1,0 +1,39 @@
+{
+  "info": {
+    "name": "API Pulse",
+    "description": "Local API collection for the API Pulse monitoring platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "monitorId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health & Dashboard",
+      "item": [
+        { "name": "Backend health", "request": { "method": "GET", "url": "{{baseUrl}}/api/health" } },
+        { "name": "Dashboard summary", "request": { "method": "GET", "url": "{{baseUrl}}/api/summary" } },
+        { "name": "List monitors", "request": { "method": "GET", "url": "{{baseUrl}}/api/monitors" } }
+      ]
+    },
+    {
+      "name": "Monitors",
+      "item": [
+        {
+          "name": "Create GitHub API monitor",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "  const body = pm.response.json();", "  pm.collectionVariables.set('monitorId', body.id);", "}"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"GitHub API\",\n  \"url\": \"https://api.github.com\"\n}" },
+            "url": "{{baseUrl}}/api/monitors"
+          }
+        },
+        { "name": "Get monitor details", "request": { "method": "GET", "url": "{{baseUrl}}/api/monitors/{{monitorId}}" } },
+        { "name": "Get check history", "request": { "method": "GET", "url": "{{baseUrl}}/api/monitors/{{monitorId}}/checks?limit=50" } },
+        { "name": "Delete monitor", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/monitors/{{monitorId}}" } }
+      ]
+    }
+  ]
+}
